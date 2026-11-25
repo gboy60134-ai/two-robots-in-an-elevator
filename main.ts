@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,6 +7,13 @@ if (!out) {
   console.error("MAKEFUN_OUTPUT_DIR is not set");
   process.exit(1);
 }
-mkdirSync(out, { recursive: true });
 const here = dirname(fileURLToPath(import.meta.url));
-copyFileSync(join(here, "entry.txt"), join(out, "entry.txt"));
+const src = join(here, "entry.txt");
+const text = readFileSync(src, "utf8");
+if (!text.trim()) {
+  console.error("entry.txt is empty");
+  process.exit(1);
+}
+console.log(`entry: ${[...text].length} characters`);
+mkdirSync(out, { recursive: true });
+copyFileSync(src, join(out, "entry.txt"));
